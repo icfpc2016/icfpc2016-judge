@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Public Problem List</h1>
+
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <th>Owner</th>
+      <th>Problem Size</th>
+      <th>Owner's Solution Size</th>
+    </tr>
+    {% for problem in problems %}
+    <tr>
+      <td>
+        <a href="/problem/view/{{ problem._id }}">{{ problem._id }}</a>
+      </td>
+      <td>
+        {{ team_display_name_map[problem.owner] }}
+      </td>
+      <td>
+        {{ problem.problem_size }}
+      </td>
+      <td>
+        {{ problem.solution_size }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "bits/pagination.html" %}
+
+<p>
+  <a href="/problem/submit">
+    <button class="btn btn-primary">
+      Submit a new problem
+    </button>
+  </a>
+  <span style="margin-left: 12px">
+    Want to get the list programatically? Check out <a href="/apihelp">REST API</a>.
+  </span>
+</p>
+{% endblock %}

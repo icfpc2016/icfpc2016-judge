@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">
+  Leaderboard
+  <small>
+    (as of {{ format_timestamp(snapshot_time) }})
+  </small>
+</h1>
+
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>Rank</th>
+      <th>Team Name</th>
+      <th>Score</th>
+    </tr>
+    {% for entry in ranking %}
+    <tr>
+      <td>
+        {{ loop.index }}
+      </td>
+      <td>
+        <a href="/admin/user/view/{{ entry.username }}">
+            {{ team_display_name_map[entry.username] }}
+        </a>
+      </td>
+      <td>
+        {{ '%.1f' % entry.score }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Submit a New Problem</h1>
+
+<p>Remember, when you make a problem submission, you are to submit a <b>valid and normalized <font color="red">solution</font></b> that generates the problem.</p>
+
+<form method="POST" action="/problem/submit" enctype="multipart/form-data">
+  <div class="form-group">
+    <label class="control-label">Solution</label>
+    <textarea class="form-control" name="solution_spec" style="height: 300px"></textarea>
+  </div>
+  <div class="form-group">
+    <label class="control-label">Schedule Time for Publication</label>
+    <select class="form-control" name="publish_time">
+      {% for publish_time in publish_times %}
+      <option value="{{ publish_time }}">{{ format_timestamp(publish_time) }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <input type="hidden" name="xsrf_token" value="{{ xsrf_token }}">
+  <button type="submit" class="btn btn-primary">Submit</button>
+  <span style="margin-left: 12px">
+    Want to submit programatically? Check out <a href="/apihelp">REST API</a>.
+  </span>
+</form>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Problem Details</h1>
+
+<table class="table table-bordered">
+  <colgroup>
+    <col style="width: 180px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <td>{{ problem._id }}</td>
+    </tr>
+    <tr>
+      <th>Submit Time</th>
+      <td>{{ format_timestamp(problem.create_time) }}</td>
+    </tr>
+    <tr>
+      <th>Publish Time</th>
+      <td>{{ format_timestamp(problem.publish_time) }}</td>
+    </tr>
+    <tr>
+      <th>Owner</th>
+      <td>
+        <a href="/admin/user/view/{{ owner._id }}">
+          {{ owner._id }}: {{ owner.display_name }}
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Problem Size</th>
+      <td>{{ problem.problem_size }}</td>
+    </tr>
+    <tr>
+      <th>Problem Spec</th>
+      <td>
+        <a href="javascript:void(0)" data-toggle="modal" data-target="#problem_modal">
+          Click here to view
+          <span class="glyphicon glyphicon-new-window"></span>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Owner's Solution Size</th>
+      <td>{{ problem.solution_size }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="problem_modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Problem Spec</h4>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" rows="10">{{ problem_spec }}</textarea>
+        <br />
+        <button class="btn btn-primary select-all">
+          Select all
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>
+  Visualization
+</h2>
+<p>
+  <img src="/admin/visualize/problem/{{ problem._id }}">
+</p>
+
+<h2>
+  Solution Ranking
+  <small>(As of {{ format_timestamp(snapshot_time) }})</small>
+</h2>
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>Rank</th>
+      <th>Owner</th>
+      <th>Resemblance</th>
+      <th>Solution Size</th>
+      <th>Solution ID</th>
+    </tr>
+    {% if not ranked_solutions %}
+    <tr>
+      <td colspan="4">
+        No solutions yet.
+      </td>
+    </tr>
+    {% endif %}
+    {% for solution in ranked_solutions %}
+    <tr>
+      <td>
+        {{ solution.injected_rank }}
+      </td>
+      <td>
+        <a href="/admin/user/view/{{ solution.owner }}">{{ team_display_name_map[solution.owner] }}</a>
+      </td>
+      <td>
+        {{ '%.6f' % (solution.resemblance_int / 1000000.0) }}
+      </td>
+      <td>
+        {{ solution.solution_size }}
+      </td>
+      <td>
+	  <a href="/admin/solution/view/{{ solution.solution_id }}">{{ solution.solution_id }}</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $('.select-all').on("click", function(e){
+        $(this).parent().find("textarea").select();
+    });
+</script>
+{% endblock script %}

@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Admin Console</h1>
+
+<p>すぱしーば</p>
+
+<ul>
+  <li><a href="/admin/user/list">Teams</a></li>
+  <li><a href="/admin/problem/list">Problems</a></li>
+  <li><a href="/admin/problem/vislist">Visualized Problems (consumes server CPUs)</a></li>
+  <li><a href="/admin/solution/list">Solutions</a></li>
+  <li><a href="/admin/leaderboard">Leaderboard</a></li>
+</ul>
+
+{% endblock %}

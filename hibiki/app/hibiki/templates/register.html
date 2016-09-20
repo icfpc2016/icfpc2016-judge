@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Registration</h1>
+
+<!--
+<p>
+  By registration you agree to
+  <a href="https://icfpc2016.blogspot.jp/2016/08/task-description.html#h.j7lfbqyfyb9m">Terms and Conditions</a>
+  of the contest. A few important quotes from the Terms and Conditions:
+  <ul>
+    <li>One person may only be member of a single team, and teams may not divide or collaborate with each other, once the contest has begun.</li>
+    <li>Do not interfere with contest servers or other teams.</li>
+  </ul>
+</p>
+
+<div class="alert alert-info" role="alert">
+  No worry for typos, there is an interface for editing all of information you enter here after registration.
+</div>
+-->
+
+<form method="POST" action="/register" enctype="multipart/form-data">
+  {% include "bits/basic_profile_form.html" %}
+  <input type="hidden" name="xsrf_token" value="{{ xsrf_token }}">
+
+  <!--
+  <p>
+    Read <a href="https://icfpc2016.blogspot.jp/2016/08/task-description.html#h.j7lfbqyfyb9m">Terms and Conditions</a>
+  </p>
+  <button type="submit" class="btn btn-primary">I have read, agree to Terms and Conditions, and Register</button>
+  -->
+  <button type="submit" class="btn btn-primary">Register</button>
+</form>
+{% endblock %}

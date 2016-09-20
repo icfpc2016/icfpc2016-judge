@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Edit Profile</h1>
+
+{% if msg == 'updated' %}
+<div class="alert alert-success" role="alert">
+  Your team profile has been updated.
+</div>
+{% endif %}
+
+<form method="POST" action="/profile" enctype="multipart/form-data">
+  <div class="form-group">
+    <label class="control-label">Team ID</label>
+    <p class="form-control-static">{{ user._id }}</p>
+  </div>
+  <div class="form-group">
+    <label class="control-label">API key</label>
+    <p class="form-control-static"><code>{{ user.api_key }}</code></p>
+    <p class="help-block">
+      Use this key to programatically access the contest system.
+      See <a href="/apihelp">the documentation</a>.
+    </p>
+  </div>
+  {% include "bits/basic_profile_form.html" %}
+  <input type="hidden" name="xsrf_token" value="{{ xsrf_token }}">
+  <button type="submit" class="btn btn-primary">Update</button>
+</form>
+{% endblock %}

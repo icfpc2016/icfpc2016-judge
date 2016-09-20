@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">
+  Leaderboard
+  <small>
+    (as of {{ format_timestamp(snapshot_time) }})
+  </small>
+</h1>
+
+<div class="alert alert-info" role="alert">
+  This is a postmortem server. The ranking in this page has nothing to do with the official ranking.
+</div>
+
+{% if sushify_mode %}
+<p><a href='/leaderboard?sushi_nothanks'>No sushi, thanks.</a></p>
+{% else %}
+<p><div align="right"><a href='/leaderboard?sushi_please'>Sushi, please!</a></div></p>
+{% endif %}
+
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>Rank</th>
+      <th>Team Name</th>
+      <th>Score</th>
+    </tr>
+    {% for entry in ranking %}
+    <tr>
+      <td>
+        {{ loop.index }}
+      </td>
+      <td>
+        {{ team_display_name_map[entry.username] }}
+      </td>
+      <td>
+        {{ entry.score | safe }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

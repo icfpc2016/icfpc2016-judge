@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Teams</h1>
+
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+      <td>
+        <a href="/admin/user/view/{{ user._id }}">
+          {{ user._id }}
+        </a>
+      </td>
+      <td>
+        <a href="/admin/user/view/{{ user._id }}">
+          {{ user.display_name }}
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+  table.table-fixed {
+    table-layout: fixed;
+  }
+  table.no-margin {
+    margin-bottom: 0;
+  }
+  pre.example-request {
+    white-space: pre-line;
+    margin-bottom: 4px;
+  }
+  pre.example-response {
+    margin-bottom: 0;
+  }
+</style>
+
+<h1 class="page-header">REST API Documentation</h1>
+
+<p>
+  You can programatically access the contest server with REST APIs.
+</p>
+
+
+
+<h2>Important Notes (Please read carefully!)</h2>
+
+<h3>No scraping</h3>
+<p>
+  You <b>must</b> use the REST APIs described here to
+  access the contest system in automated ways from your program. No
+  automated accesses are allowed via the web interface.
+</p>
+
+<h3>Rate limits</h3>
+<p>
+  API requests are rate-limited.
+  You must wait at least 1 second between successive API requests.
+  Also, every API have their own rate limits, as described below in this page.
+  When you exceed these limits, your requests will fail with <code>429 Rate limit exceeded</code>.
+</p>
+
+<h3>Gzip requirement</h3>
+<p>
+  API responses are gzip'ed to save bandwidth.
+  In order to allow the response compression, requests should be marked with
+  <code>Accept-Encoding: gzip</code>.
+  If you are using <code>curl</code> command, you can enable response compression by
+  <code>--compressed</code> option.
+  If you do not set the header, your requests will fail with <code>400 Bad Request</code>.
+</p>
+
+<h3>Redirect requirement</h3>
+<p>
+  API responses may contain <code>Location:</code> header to redirect you to
+  another URL.
+  If you are using <code>curl</code> command, you can enable redirect by
+  <code>-L</code> option.
+</p>
+
+<h3>No Expect: 100-continue</h3>
+<p>
+  Some HTTP clients (including curl) use <code>Expect: 100-continue</code> to
+  avoid sending the request body when possible, but our server does not
+  support this protocol. Please make sure to turn off this feature in your
+  client. In the case of curl, you can disable it by <code>-H Expect:</code>.
+  If your requests contain <code>Expect: 100-continue</code>, your requests
+  will mysteriously fail with <code>502 Bad Gateway</code> without any good
+  diagnostic message.
+</p>
+
+<h3>Handle errors correctly</h3>
+<p>
+  Due to infrastructure issues, your request might be rejected even if it is
+  correct.
+  5xx HTTP response is a transient error, so please try your request again
+  (except for <code>Expect:</code> case described above; though its status
+  code is 502, it is not a transient error).
+  4xx HTTP response indicates your request was rejected by your fault, so
+  please do not retry immediately.
+</p>
+
+
+<h2>API Key</h2>
+
+<p>
+  Your team's API key is
+  <code id="api_key">{{ current_user['api_key'] }}</code>.
+  Please make sure to set this API key in <code>X-API-Key</code> header of
+  API requests to authenticate.
+</p>
+
+
+
+<h2 id="api-overview">API Overview</h2>
+<p>The REST API consists of the following five functions:</p>
+<ul>
+    <li><a href="#hello_world">Hello, World!</a></li>
+    <li><a href="#blob_lookup">Blob Lookup</a></li>
+    <li><a href="#snapshot_query">Contest Status Snapshot Query</a></li>
+    <li><a href="#problem_submission">Problem Submission</a></li>
+    <li><a href="#solution_submission">Solution Submission</a></li>
+</ul>
+<p>First of all, try a <a href="#hello_world">Hello, World!</a> API call to check if your authentication is working well.</p>
+<p>Then, call <a href="#snapshot_query">contest status snapshot query</a> and get a list of <code>snapshot_hash</code>es together with their timestamps. Call <a href="#blob_lookup">blob lookup</a> with the latest <code>snapshot_hash</code> substituted to the <code>[hash]</code> argument. You will get the contest status snapshot, like the following example:</p>
+<pre><code>{
+   &quot;problems&quot;:[
+      {
+         &quot;ranking&quot;:[],
+         &quot;publish_time&quot;:1469804400,
+         &quot;solution_size&quot;:31,
+         &quot;problem_id&quot;:1,
+         &quot;owner&quot;:&quot;1&quot;,
+         &quot;problem_size&quot;:39,
+         &quot;problem_spec_hash&quot;:&quot;44f66105e0136a9ea0a4fa4b055c35318ed8840f&quot;
+      },
+      {
+         &quot;ranking&quot;:[
+            {
+               &quot;resemblance&quot;:1.0,
+               &quot;solution_size&quot;:31
+            },
+            {
+               &quot;resemblance&quot;:0.957441,
+               &quot;solution_size&quot;:1472
+            }
+         ],
+         &quot;publish_time&quot;:1469804400,
+         &quot;solution_size&quot;:31,
+         &quot;problem_id&quot;:2,
+         &quot;owner&quot;:&quot;1&quot;,
+         &quot;problem_size&quot;:39,
+         &quot;problem_spec_hash&quot;:&quot;d5cc53ef095f64c04f2d6da3c73e5e5857e8fb74&quot;
+      },
+   ],
+   &quot;snapshot_time&quot;:1470096660,
+   &quot;leaderboard&quot;:[
+      {
+         &quot;username&quot;:&quot;12&quot;,
+         &quot;score&quot;:13334.670241
+      },
+      {
+         &quot;username&quot;:&quot;13&quot;,
+         &quot;score&quot;:5915.387804
+      },
+      {
+         &quot;username&quot;:&quot;16&quot;,
+         &quot;score&quot;:2953.208622
+      },
+   ],
+   &quot;users&quot;:[
+      {
+         &quot;username&quot;:&quot;13&quot;,
+         &quot;display_name&quot;:&quot;Hattori Hanzo&quot;
+      },
+      {
+         &quot;username&quot;:&quot;12&quot;,
+         &quot;display_name&quot;:&quot;Fuma Kotaro&quot;
+      },
+      {
+         &quot;username&quot;:&quot;16&quot;,
+         &quot;display_name&quot;:&quot;Fujita Seiko&quot;
+      }
+   ]
+}
+</code></pre>
+<p>As you can see, a contest status snapshot consists of the following items:</p>
+<ul>
+<li><code>problems</code> : The list of problems.</li>
+<li><code>snapshot_time</code> : The timestamp of this snapshot.</li>
+<li><code>leaderboard</code> : The list of usernames together with their scores, in descending order of the score.</li>
+<li><code>users</code> : The mapping from the <code>username</code>s to their choice of <code>display_name</code>s.</li>
+<li><code>ranking</code> : The anonymous list of the resemblance and the size of the submitted solution.</li>
+</ul>
+<p>and a problem item consists of the following items:</p>
+
+<ul>
+<li><code>publish_time</code> : The time the problem was published.</li>
+<li><code>solution_size</code> : The size of the solution submitted by the problem owner (the team who set this problem).</li>
+<li><code>problem_id</code> : The ID of this problem. Specify this ID when you submit your solution to this problem.</li>
+<li><code>owner</code> : The <code>username</code> of the problem owner.</li>
+<li><code>problem_size</code> : The size of the problem specification.</li>
+<li><code>problem_spec_hash</code> : The hash for looking up the specification of this problem.</li>
+</ul>
+<p>Call the <a href="#blob_lookup">blob lookup</a> API with the <code>problem_spec_hash</code> as argument to retrieve the contents of the problem. Then, use the <a href="#solution_submission">solution submission</a> API to submit your solution.</p>
+<p>Also, don't forget that  you can publish your own problems during the contest, and earn scores from doing so. Use the <a href="#problem_submission">problem submission</a> API to submit your problems.</p>
+
+
+
+<h2>API Reference</h2>
+
+<h3 id="hello_world">Hello, world!</h3>
+
+<p>
+  Just authenticates a request and replies with a fixed message.
+  For debugging purposes.
+</p>
+
+<table class="table table-condensed table-bordered table-fixed">
+  <colgroup>
+    <col style="width: 120px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Endpoint</th>
+      <td><code>http://{{ hostname }}/api/hello</code></td>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <td>GET</td>
+    </tr>
+    <tr>
+      <th>Rate Limit</th>
+      <td>1000 requests / hour</td>
+    </tr>
+    <tr>
+      <th>Parameters</th>
+      <td>No parameter.</td>
+    </tr>
+    <tr>
+      <th>Example</th>
+      <td>
+        <pre class="example-request">% curl --compressed -L -H Expect: -H 'X-API-Key: {{ current_user['api_key'] }}' 'http://{{ hostname }}/api/hello'</pre>
+        <pre class="example-response">{
+  "ok": true,
+  "greeting": "Hello, world!"
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3 id="blob_lookup">Blob Lookup</h3>
+
+<p>
+    Looks up a blob (the content of something) by its hash. The hash can be: <code>problem_spec_hash</code>, <code>solution_spec_hash</code>, <code>snapshot_hash</code>, etc.
+</p>
+
+<table class="table table-condensed table-bordered table-fixed">
+  <colgroup>
+    <col style="width: 120px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Endpoint</th>
+      <td><code>http://{{ hostname }}/api/blob/[hash]</code></td>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <td>GET</td>
+    </tr>
+    <tr>
+      <th>Rate Limit</th>
+      <td>
+        {{ api_rate_limit_blob_lookups_in_window }} requests / hour
+      </td>
+    </tr>
+    <tr>
+      <th>Parameters</th>
+      <td>
+        <table class="table table-condensed table-bordered table-fixed no-margin">
+          <colgroup>
+            <col style="width: 120px">
+            <col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <th>hash</th>
+              <td>Hash of a blob.</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <th>Example</th>
+      <td>
+        <pre class="example-request">% curl --compressed -L -H Expect: -H 'X-API-Key: {{ current_user['api_key'] }}' 'http://{{ hostname }}/api/blob/f4b1a8567108144bae331340a57c68b85df487e0'</pre>
+        <pre class="example-response">1
+4
+0,0
+1,0
+1/2,1/2
+0,1/2
+5
+0,0 1,0
+0,0 1/2,1/2
+0,0 0,1/2
+0,1/2 1/2,1/2
+1,0 1/2,1/2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3 id="snapshot_query">Contest Status Snapshot Query</h3>
+
+<p>
+  Returns the list of contest information snapshots.
+  Snapshots are computed only once per hour.
+  Use <a href="#blob_lookup">blob lookup</a> API to retrieve actual snapshots by <code>snapshot_hash</code>.
+</p>
+
+<table class="table table-condensed table-bordered table-fixed">
+  <colgroup>
+    <col style="width: 120px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Endpoint</th>
+      <td><code>http://{{ hostname }}/api/snapshot/list</code></td>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <td>GET</td>
+    </tr>
+    <tr>
+      <th>Rate Limit</th>
+      <td>1000 requests / hour</td>
+    </tr>
+    <tr>
+      <th>Parameters</th>
+      <td>No parameter required.</td>
+    </tr>
+    <tr>
+      <th>Example</th>
+      <td>
+        <pre class="example-request">% curl --compressed -L -H Expect: -H 'X-API-Key: {{ current_user['api_key'] }}' 'http://{{ hostname }}/api/snapshot/list'</pre>
+        <pre class="example-response">{
+  "ok": true,
+  "snapshots": [
+    {
+      "snapshot_time": 1470355200,
+      "snapshot_hash": "0123456789abcdef0123456789abcdef"
+    },
+    {
+      "snapshot_time": 1470358800,
+      "snapshot_hash": "fedcba9876543210fedcba9876543210"
+    }
+  ]
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3 id="problem_submission">Problem Submission</h3>
+
+<p>
+  Submits a problem, so that the problem is scheduled to be published at the designated timestamp. If you submit multiple problems with same timestamp, the latest submission will be used.
+</p>
+
+<table class="table table-condensed table-bordered table-fixed">
+  <colgroup>
+    <col style="width: 120px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Endpoint</th>
+      <td><code>http://{{ hostname }}/api/problem/submit</code></td>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <th>Rate Limit</th>
+      <td>
+        {{ api_rate_limit_submissions_in_window }} requests / hour
+        (the number of requests is the sum of the problem and solution submissions)
+      </td>
+    </tr>
+    <tr>
+      <th>Parameters</th>
+      <td>
+        <table class="table table-condensed table-bordered table-fixed no-margin">
+          <colgroup>
+            <col style="width: 120px">
+            <col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <th>solution_spec</th>
+              <td>The specification of a valid and normalized <b>solution</b> that produces the problem you want to submit.</td>
+            </tr>
+            <tr>
+              <th>publish_time</th>
+              <td>
+                Timestamp of when you want the problem to be published.<br>
+                Possible values are:<br>
+                <ul>
+                  <li>
+                    {{ first_publish_time }}
+                    ({{ format_timestamp(first_publish_time) }})
+                  </li>
+                  <li>
+                    {{ first_publish_time + snapshot_interval }}
+                    ({{ format_timestamp(first_publish_time + snapshot_interval) }})
+                  </li>
+                  <li>
+                    {{ first_publish_time + snapshot_interval * 2 }}
+                    ({{ format_timestamp(first_publish_time + snapshot_interval * 2) }})
+                  </li>
+                  <li>...</li>
+                  <li>
+                    {{ last_publish_time }}
+                    ({{ format_timestamp(last_publish_time) }})
+                  </li>
+                </ul>
+                Requests with invalid <code>publish_time</code> will fail with <code>403 Forbidden</code>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <th>Example</th>
+      <td>
+        <pre class="example-request">% curl --compressed -L -H Expect: -H 'X-API-Key: {{ current_user['api_key'] }}' -F 'solution_spec=@work/solution.txt' -F 'publish_time={{ first_publish_time }}' 'http://{{ hostname }}/api/problem/submit'</pre>
+        <pre class="example-response">{
+  "ok": true,
+  "problem_id": 4,
+  "publish_time": 1475280000,
+  "solution_spec_hash": "27e3c42fa46aec6fcf438bb5c326d55e27c91811",
+  "solution_size": 78,
+  "problem_spec_hash": "f4b1a8567108144bae331340a57c68b85df487e0",
+  "problem_size": 67
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3 id="solution_submission">Solution Submission</h3>
+
+<p>
+  Submits a solution to the specified problem.
+</p>
+
+<table class="table table-condensed table-bordered table-fixed">
+  <colgroup>
+    <col style="width: 120px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Endpoint</th>
+      <td><code>http://{{ hostname }}/api/solution/submit</code></td>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <td>POST</td>
+    </tr>
+    <tr>
+      <th>Rate Limit</th>
+      <td>
+        {{ api_rate_limit_submissions_in_window }} requests / hour
+        (the nubmer of requests is the sum of those of the problem and solution submissions)
+      </td>
+    </tr>
+    <tr>
+      <th>Parameters</th>
+      <td>
+        <table class="table table-condensed table-bordered table-fixed no-margin">
+          <colgroup>
+            <col style="width: 120px">
+            <col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <th>problem_id</th>
+              <td>The ID of the problem you are solving.</td>
+            </tr>
+            <tr>
+              <th>solution_spec</th>
+              <td>The specification of your solution to the problem.</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <th>Example</th>
+      <td>
+        <pre class="example-request">% curl --compressed -L -H Expect: -H 'X-API-Key: {{ current_user['api_key'] }}' -F 'problem_id=1' -F 'solution_spec=@work/solution.txt' 'http://{{ hostname }}/api/solution/submit'</pre>
+        <pre class="example-response">{
+  "ok": true,
+  "problem_id": 1,
+  "resemblance": 1.0,
+  "solution_spec_hash": "27e3c42fa46aec6fcf438bb5c326d55e27c91811",
+  "solution_size": 78
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+{% endblock %}

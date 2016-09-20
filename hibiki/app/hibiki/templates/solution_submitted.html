@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Solution Submitted</h1>
+
+{% if is_admin %}
+<p>
+  <span class="glyphicon glyphicon-lock"></span>
+  <a href="/admin/solution/view/{{ solution._id }}">See in the admins page</a>
+</p>
+{% endif %}
+
+<table class="table table-bordered">
+  <colgroup>
+    <col style="width: 180px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Problem ID</th>
+      <td><a href="/problem/view/{{ solution.problem_id }}">{{ solution.problem_id }}</a></td>
+    </tr>
+    <tr>
+      <th>Solution Spec</th>
+      <td>
+        <a href="javascript:void(0)" data-toggle="modal" data-target="#solution_modal">
+          Click here to view
+          <span class="glyphicon glyphicon-new-window"></span>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Solution Size</th>
+      <td>{{ solution.solution_size }}</td>
+    </tr>
+    <tr>
+      <th>Resemblance</th>
+      <td>
+        <b>{{ '%.6f' % (solution.resemblance_int / 1000000.0) }}</b>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="solution_modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Solution Spec</h4>
+      </div>
+      <div class="modal-body">
+        <pre>{{ solution_spec }}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>
+  <a href="/">
+    <button class="btn btn-primary">
+      Go back to home
+    </button>
+  </a>
+</p>
+
+{% endblock %}

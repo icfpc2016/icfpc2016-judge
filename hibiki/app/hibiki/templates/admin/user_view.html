@@ -1,0 +1,156 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Team Details</h1>
+
+<table class="table table-bordered">
+  <colgroup>
+    <col style="width: 200px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <td>{{ user._id }}</td>
+    </tr>
+    <tr>
+      <th>Display Name</th>
+      <td>{{ user.display_name }}</td>
+    </tr>
+    <tr>
+      <th>Registration Time</th>
+      <td>{{ format_timestamp(user.create_time) }}</td>
+    </tr>
+    <tr>
+      <th>Contact Email</th>
+      <td>
+        {{ user.contact_email }}
+      </td>
+    </tr>
+    <tr>
+      <th>Team Members</th>
+      <td><span style="white-space: pre">{{ user.member_names }}</span></td>
+    </tr>
+    <tr>
+      <th>Nationalities</th>
+      <td>{{ user.nationalities }}</td>
+    </tr>
+    <tr>
+      <th>Languages</th>
+      <td>{{ user.languages }}</td>
+    </tr>
+    <tr>
+      <th>Source code URL</th>
+      <td>{{ user.source_url }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>
+  Statistics
+</h2>
+<table class="table table-bordered">
+  <tbody>
+    <tr>
+      <th># Public / All Problems</th>
+      <td>{{ statistics.public_problem_count }} / {{ statistics.problem_count }}</td>
+    </tr>
+    <tr>
+      <th>Total Problem Score</th>
+      <td>{{ statistics.total_problem_score }}</td>
+    </tr>
+    <tr>
+      <th># Perfect / Imperfect / All Soltions</th>
+      <td>
+        {{ statistics.perfect_solution_count }} /
+        {{ statistics.imperfect_solution_count }} /
+        {{ statistics.solution_count }}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>
+  Submitted Problems
+</h2>
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <th>Public</th>
+      <th>Problem Size</th>
+      <th>Owner's Solution Size</th>
+      <th>Perfect Solution Count</th>
+      <th>Total Solution Count</th>
+      <th>Score</th>
+    </tr>
+    {% if not problems %}
+    <tr>
+      <td colspan="7">
+        No problems yet.
+      </td>
+    </tr>
+    {% endif %}
+    {% for problem in problems %}
+    <tr>
+      <td>
+        <a href="/admin/problem/view/{{ problem._id }}">{{ problem._id }}</a>
+      </td>
+      <td>
+        {% if problem.public %}
+        <span class="glyphicon glyphicon-ok"></span>
+        {% endif %}
+      </td>
+      <td>
+        {{ problem.problem_size }}
+      </td>
+      <td>
+        {{ problem.solution_size }}
+      </td>
+      <td>
+        {{ problem.perfect_solution_count }}
+      </td>
+      <td>
+        {{ problem.solution_count }}
+      </td>
+      <td>
+        {{ problem.problem_score }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>
+  Submitted Solutions
+</h2>
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>Problem ID</th>
+      <th>Resemblance</th>
+      <th>Solution ID</th>
+    </tr>
+    {% if not solutions %}
+    <tr>
+      <td colspan="3">
+        No solutions yet.
+      </td>
+    </tr>
+    {% endif %}
+    {% for solution in solutions %}
+    <tr>
+      <td>
+        {{ solution.problem_id }}
+      </td>
+      <td>
+        {{ '%.6f' % (solution.resemblance_int / 1000000.0) }}
+      </td>
+      <td>
+        <a href="/admin/solution/view/{{ solution._id }}">{{ solution._id }}</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

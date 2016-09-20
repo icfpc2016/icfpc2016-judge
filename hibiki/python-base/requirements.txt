@@ -1,0 +1,2 @@
+matplotlib==1.5.1
+uwsgi==2.0.12

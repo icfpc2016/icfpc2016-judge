@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Welcome to the Contest System!</h1>
+
+<div class="alert alert-info" role="alert">
+  This is a postmortem server.
+  You need to register a new team again even if you have registered to the proper contest system.
+</div>
+
+<p>
+  <a class="btn btn-default btn-lg" href="/register" role="button">
+    Register a new team
+  </a>
+  <a class="btn btn-default btn-lg" href="/login" role="button">
+    Login as a team
+  </a>
+</p>
+
+<p>
+  <a class="btn btn-default btn-lg" href="/leaderboard" role="button">
+    View public leaderboard
+  </a>
+</p>
+{% endblock %}

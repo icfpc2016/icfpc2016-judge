@@ -1,0 +1,25 @@
+--debug
+--enable_load_test_hacks
+--run_cron_in_background
+--remove_stale_snapshots_demo_only
+
+--admin_password=admin
+--mongodb_url=mongodb://localhost
+
+# date -u -d '2016-01-01 00:00:00' +%s
+--contest_start_time=1451606400
+# date -u -d '2016-02-01 00:00:00' +%s
+--contest_first_publish_time=1454284800
+# date -u -d '2016-11-01 00:00:00' +%s
+--contest_freeze_time=1477958400
+# date -u -d '2016-12-01 00:00:00' +%s
+--contest_last_publish_time=1480550400
+# date -u -d '2017-01-01 00:00:00' +%s
+--contest_end_time=1483228800
+--contest_primary_snapshot_interval=60
+--contest_secondary_snapshot_interval=10
+
+--api_rate_limit_window_size=10
+--api_rate_limit_submissions_in_window=1000000
+--api_rate_limit_blob_lookups_in_window=1000000
+--api_rate_limit_request_interval=0

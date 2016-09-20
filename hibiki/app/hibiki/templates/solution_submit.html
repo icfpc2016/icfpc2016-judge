@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Submit a Solution</h1>
+
+<form method="POST" action="/solution/submit" enctype="multipart/form-data">
+  <div class="form-group">
+    <label class="control-label">Problem ID</label>
+    <input type="text" class="form-control" name="problem_id" value="{{ problem_id }}">
+  </div>
+  <div class="form-group">
+    <label class="control-label">Solution</label>
+    <textarea class="form-control" name="solution_spec" style="height: 300px"></textarea>
+  </div>
+  <input type="hidden" name="xsrf_token" value="{{ xsrf_token }}">
+  <button type="submit" class="btn btn-primary">Submit</button>
+  <span style="margin-left: 12px">
+    Want to submit programatically? Check out <a href="/apihelp">REST API</a>.
+  </span>
+</form>
+{% endblock %}

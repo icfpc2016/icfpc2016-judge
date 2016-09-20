@@ -1,0 +1,95 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Solution Details</h1>
+
+<table class="table table-bordered">
+  <colgroup>
+    <col style="width: 200px">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Solution ID</th>
+      <td>{{ solution._id }}</td>
+    </tr>
+    <tr>
+      <th>Submit Time</th>
+      <td>{{ format_timestamp(solution.create_time) }}</td>
+    </tr>
+    <tr>
+      <th>Owner</th>
+      <td>
+        <a href="/admin/user/view/{{ solution_owner._id }}">
+          {{ solution_owner.display_name }}
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Problem</th>
+      <td>
+        <a href="/admin/problem/view/{{ solution.problem_id }}">
+          Problem {{ solution.problem_id }}
+        </a>
+        by
+        <a href="/admin/user/view/{{ problem_owner._id }}">
+          {{ problem_owner.display_name }}
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Solution Spec</th>
+      <td>
+        <a href="javascript:void(0)" data-toggle="modal" data-target="#solution_modal">
+          Click here to view
+          <span class="glyphicon glyphicon-new-window"></span>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <th>Solution Size</th>
+      <td>{{ solution.solution_size }}</td>
+    </tr>
+    <tr>
+      <th>Resemblance</th>
+      <td>
+        <b>{{ '%.6f' % (solution.resemblance_int / 1000000.0) }}</b>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="solution_modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Solution Spec</h4>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" rows="10">{{ solution_spec }}</textarea>
+        <br />
+        <button class="btn btn-primary select-all">
+          Select all
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>
+  Visualization
+</h2>
+<p>
+  <img src="/admin/visualize/solution/{{ solution._id }}">
+</p>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $('.select-all').on("click", function(e){
+        $(this).parent().find("textarea").select();
+    });
+</script>
+{% endblock script %}

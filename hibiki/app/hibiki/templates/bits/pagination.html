@@ -1,0 +1,38 @@
+<nav>
+  <ul class="pagination">
+
+    {% if pagination.has_prev %}
+    <li>
+      <a href="?page={{ pagination.current_page - 1 }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="disabled">
+      <span aria-hidden="true">&laquo;</span>
+    </li>
+    {% endif %}
+
+    {% for page in pagination.iter_pages() %}
+    {% if page %}
+    <li class="{{ page == pagination.current_page and 'active' }}">
+      <a href="?page={{ page }}">{{ page }}</a>
+    </li>
+    {% else %}
+    <li><span class="ellipsis">…</span></li>
+    {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+    <li>
+      <a href="?page={{ pagination.current_page + 1 }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="disabled">
+      <span aria-hidden="true">&raquo;</span>
+    </li>
+    {% endif %}
+  </ul>
+</nav>

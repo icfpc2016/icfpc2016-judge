@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Solutions</h1>
+
+<table class="table table-condensed table-striped">
+  <tbody>
+    <tr>
+      <th>ID</th>
+      <th>Time</th>
+      <th>Owner</th>
+      <th>Problem</th>
+      <th>Resemblance</th>
+      <th>Solution Size</th>
+    </tr>
+    {% for solution in solutions %}
+    <tr>
+      <td>
+        <a href="/admin/solution/view/{{ solution._id }}">
+          {{ solution._id }}
+        </a>
+      </td>
+      <td>
+        <a href="/admin/solution/view/{{ solution._id }}">
+          {{ format_timestamp(solution.create_time) }}
+        </a>
+      </td>
+      <td>
+        <a href="/admin/user/view/{{ solution.owner }}">
+          {{ team_display_name_map[solution.owner] }}
+        </a>
+      </td>
+      <td>
+        <a href="/admin/problem/view/{{ solution.problem_id }}">
+          {{ solution.problem_id }}
+        </a>
+      </td>
+      <td>
+        {{ '%.6f' % (solution.resemblance_int / 1000000.0) }}</b>
+      </td>
+      <td>
+        {{ solution.solution_size }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "bits/pagination.html" %}
+
+{% endblock %}

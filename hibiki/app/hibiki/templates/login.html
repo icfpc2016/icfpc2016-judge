@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block body %}
+<h1 class="page-header">Login</h1>
+
+{% if msg == 'fail' %}
+<div class="alert alert-danger" role="alert">
+  Incorrect team ID or password.
+</div>
+{% endif %}
+
+{% if is_admin %}
+<div class="alert alert-info" role="alert">
+  Hi Admin! You can log into any passwordless teams without password.
+</div>
+{% endif %}
+
+<form method="POST" action="/login" enctype="multipart/form-data">
+  <div class="form-group">
+    <label class="control-label">Team ID</label>
+    <input type="text" class="form-control" name="username">
+  </div>
+  <div class="form-group">
+    <label class="control-label">Password</label>
+    <input type="password" class="form-control" name="password">
+  </div>
+  <input type="hidden" name="xsrf_token" value="{{ xsrf_token }}">
+  <button type="submit" class="btn btn-primary">Login</button>
+</form>
+{% endblock %}

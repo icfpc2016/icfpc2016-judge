@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+
+{% block body %}
+<h1 class="page-header">Problems</h1>
+
+<div>
+  {% for problem in problems %}
+  <a href="/admin/problem/view/{{ problem._id }}"><img src="/admin/visualize/problem/{{ problem._id }}?thumbnail=yes" style="width: 140px; height: 140px"></a>
+  {% endfor %}
+</div>
+
+{% include "bits/pagination.html" %}
+
+{% endblock %}
