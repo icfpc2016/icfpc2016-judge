@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ICFP Contest 2016 Contest System</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    
+  </head>
+  <body>
+    
+
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="http://icfpc2016.blogspot.jp/">ICFP Contest 2016</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+<style type="text/css">
+table {
+    border-collapse: separate;
+    border-spacing: 10px 3px;
+}
+td, th {
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+}
+canvas {
+    border: 1px solid #000000;
+    cursor: default;
+}
+#navi {
+    -webkit-animation: switchtext 0.5s infinite alternate;
+    -moz-animation: switchtext 0.5s infinite alternate;
+    animation: switchtext 0.5s infinite alternate;
+    position: absolute;
+    top: 128px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    pointer-events: none;
+    font-size: large;
+}
+@-webkit-keyframes switchtext {
+    from { opacity: 1.0; }
+    to { opacity: 0; }
+}
+@-moz-keyframes switchtext {
+    from { opacity: 1.0; }
+    to { opacity: 0; }
+}
+@keyframes switchtext {
+    from { opacity: 1.0; }
+    to { opacity: 0; }
+}
+</style>
+<table id="origami">
+  <tr><th>Source (view only)</th><th>Destination</th></tr>
+  <tr>
+    <td>
+      <canvas id="src" width="300" height="300"></canvas>
+    </td>
+    <td>
+      <canvas id="dst" width="300" height="300"></canvas>
+      <span id="navi">Drag here!</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Origami playground
+    </td>
+    <td>
+      <div class="btn-group">
+	<button id="undo" type="button" class="btn btn-default">Undo</button>
+	<button id="flip" type="button" class="btn btn-default">Flip</button>
+	<div id="texture" class="btn-group dropup">
+	  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    Texture <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu">
+	    <li data-texture-id="1" class="active"><a href="#">Flowers Red</a></li>
+	    <li data-texture-id="2"><a href="#">Flower Wave</a></li>
+	    <li data-texture-id="3"><a href="#">Flowers Yellow-green</a></li>
+	    <li data-texture-id="4"><a href="#">Japanese apricot Red</a></li>
+	    <li role="separator" class="divider"></li>
+	    <li data-texture-id=""><a href="#">Skeleton</a></li>
+	  </ul>
+	</div>
+	<div id="silhouette" class="btn-group dropup">
+	  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    Silhouette <span class="caret"></span>
+	  </button>
+	  <ul id="silhouette-list" class="dropdown-menu">
+	    <li data-silhouette-id="" class="active"><a href="#">(none)</a></li>
+	  </ul>
+	</div>
+      </div>
+      <br />
+      <span style="font-size: small">(The textures are taken from <a href="http://japanese-pattern.info/en/">Wargo Pattern</a>.)</span>
+    </td>
+  </tr>
+</table>
+<p>Note: This tool is just for reference; it supports only simple valley folds, so you may not be able to create some complex silhouettes with this tool. The interactive tool is not part of the task description, and the judges offer no guarantee of its consistency with the task description. The judges will not use this tool to evaluate your solutions.</p>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    
+    <script src="play.js"></script>
+
+  </body>
+</html>
